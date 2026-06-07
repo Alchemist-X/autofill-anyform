@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoFill AnyForm — Sample Test Form</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+      color: #1a1a2e;
+      background: #f5f7fa;
+      padding: 32px 16px;
+    }
+    .page {
+      max-width: 680px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    h1 { font-size: 22px; font-weight: 700; color: #1a1a2e; }
+    .subtitle { font-size: 13px; color: #6b7280; margin-top: 4px; }
+    .card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    h2 { font-size: 15px; font-weight: 600; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field-group { display: flex; flex-direction: column; gap: 5px; }
+    .field-group.full { grid-column: 1 / -1; }
+    label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #6b7280;
+    }
+    input, select, textarea {
+      padding: 8px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 14px;
+      width: 100%;
+      background: #fff;
+      transition: border-color 0.15s;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #4f9ef8;
+      box-shadow: 0 0 0 3px rgba(79,158,248,0.15);
+    }
+    textarea { resize: vertical; min-height: 72px; }
+    .btn-submit {
+      align-self: flex-start;
+      padding: 10px 24px;
+      background: #4f9ef8;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-submit:hover { background: #3b8ef0; }
+    .note {
+      font-size: 12px;
+      color: #9ca3af;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 10px 14px;
+    }
+    @media (max-width: 500px) {
+      .grid { grid-template-columns: 1fr; }
+      .field-group.full { grid-column: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div>
+      <h1>Sample Test Form</h1>
+      <p class="subtitle">
+        Open the AutoFill AnyForm popup and click "Fill this page" to see the extension in action.
+      </p>
+    </div>
+
+    <p class="note">
+      This form uses a variety of field patterns — autocomplete attributes, explicit labels, placeholder text, and ambiguous names — to test heuristic matching.
+    </p>
+
+    <form id="sampleForm" onsubmit="return false;">
+
+      <!-- Section 1: Standard autocomplete attributes -->
+      <div class="card">
+        <h2>Standard Fields (autocomplete attributes)</h2>
+        <div class="grid">
+          <div class="field-group">
+            <label for="ac-given">First Name</label>
+            <input type="text" id="ac-given" name="given_name" autocomplete="given-name" placeholder="First name" />
+          </div>
+          <div class="field-group">
+            <label for="ac-family">Last Name</label>
+            <input type="text" id="ac-family" name="family_name" autocomplete="family-name" placeholder="Last name" />
+          </div>
+          <div class="field-group">
+            <label for="ac-email">Email</label>
+            <input type="email" id="ac-email" name="email" autocomplete="email" placeholder="you@example.com" />
+          </div>
+          <div class="field-group">
+            <label for="ac-tel">Phone</label>
+            <input type="tel" id="ac-tel" name="phone" autocomplete="tel" placeholder="+1 555-000-0000" />
+          </div>
+          <div class="field-group full">
+            <label for="ac-addr1">Street Address</label>
+            <input type="text" id="ac-addr1" name="address_line1" autocomplete="address-line1" placeholder="123 Main St" />
+          </div>
+          <div class="field-group full">
+            <label for="ac-addr2">Apartment, suite, etc.</label>
+            <input type="text" id="ac-addr2" name="address_line2" autocomplete="address-line2" placeholder="Apt 4B" />
+          </div>
+          <div class="field-group">
+            <label for="ac-city">City</label>
+            <input type="text" id="ac-city" name="city" autocomplete="address-level2" placeholder="Springfield" />
+          </div>
+          <div class="field-group">
+            <label for="ac-state">State</label>
+            <input type="text" id="ac-state" name="state" autocomplete="address-level1" placeholder="CA" />
+          </div>
+          <div class="field-group">
+            <label for="ac-zip">ZIP / Postal Code</label>
+            <input type="text" id="ac-zip" name="postal_code" autocomplete="postal-code" placeholder="90210" />
+          </div>
+          <div class="field-group">
+            <label for="ac-country">Country</label>
+            <input type="text" id="ac-country" name="country" autocomplete="country" placeholder="US" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Label-based heuristic matching -->
+      <div class="card">
+        <h2>Label Heuristic Fields (no autocomplete)</h2>
+        <div class="grid">
+          <div class="field-group">
+            <label for="h-fname">Given Name</label>
+            <input type="text" id="h-fname" name="h_fname" placeholder="Your first name" />
+          </div>
+          <div class="field-group">
+            <label for="h-lname">Surname</label>
+            <input type="text" id="h-lname" name="h_lname" placeholder="Your last name" />
+          </div>
+          <div class="field-group">
+            <label for="h-org">Organization</label>
+            <input type="text" id="h-org" name="h_org" placeholder="Your company" />
+          </div>
+          <div class="field-group">
+            <label for="h-role">Job Role / Position</label>
+            <input type="text" id="h-role" name="h_role" placeholder="e.g. Engineer" />
+          </div>
+          <div class="field-group">
+            <label for="h-mobile">Mobile Number</label>
+            <input type="tel" id="h-mobile" name="h_mobile" placeholder="Cell phone" />
+          </div>
+          <div class="field-group">
+            <label for="h-web">Homepage URL</label>
+            <input type="url" id="h-web" name="h_web" placeholder="https://…" />
+          </div>
+          <div class="field-group full">
+            <label for="h-street">Street</label>
+            <input type="text" id="h-street" name="h_street" placeholder="Street address" />
+          </div>
+          <div class="field-group">
+            <label for="h-town">Town</label>
+            <input type="text" id="h-town" name="h_town" placeholder="City or town" />
+          </div>
+          <div class="field-group">
+            <label for="h-province">Province / Region</label>
+            <input type="text" id="h-province" name="h_province" placeholder="Region" />
+          </div>
+          <div class="field-group">
+            <label for="h-pin">Pin Code</label>
+            <input type="text" id="h-pin" name="h_pin" placeholder="Postal / ZIP" />
+          </div>
+          <div class="field-group">
+            <label for="h-nation">Nation</label>
+            <input type="text" id="h-nation" name="h_nation" placeholder="Country" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Placeholder-only (no label, no autocomplete) -->
+      <div class="card">
+        <h2>Placeholder-Only Fields (aria-label)</h2>
+        <div class="grid">
+          <div class="field-group">
+            <input type="text" aria-label="First name" name="p_first" placeholder="First name" />
+          </div>
+          <div class="field-group">
+            <input type="text" aria-label="Last name" name="p_last" placeholder="Last name" />
+          </div>
+          <div class="field-group">
+            <input type="email" aria-label="Email address" name="p_email" placeholder="Email address" />
+          </div>
+          <div class="field-group">
+            <input type="tel" aria-label="Phone number" name="p_tel" placeholder="Phone number" />
+          </div>
+          <div class="field-group full">
+            <input type="text" aria-label="Full name" name="p_fullname" placeholder="Full name" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 4: Select dropdowns -->
+      <div class="card">
+        <h2>Select Fields</h2>
+        <div class="grid">
+          <div class="field-group">
+            <label for="sel-country">Country</label>
+            <select id="sel-country" name="sel_country" autocomplete="country">
+              <option value="">-- Select --</option>
+              <option value="US">United States</option>
+              <option value="CA">Canada</option>
+              <option value="GB">United Kingdom</option>
+              <option value="AU">Australia</option>
+              <option value="DE">Germany</option>
+              <option value="FR">France</option>
+              <option value="JP">Japan</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="sel-state">State</label>
+            <select id="sel-state" name="sel_state" autocomplete="address-level1">
+              <option value="">-- Select --</option>
+              <option value="AL">Alabama</option>
+              <option value="AK">Alaska</option>
+              <option value="AZ">Arizona</option>
+              <option value="CA">California</option>
+              <option value="CO">Colorado</option>
+              <option value="FL">Florida</option>
+              <option value="GA">Georgia</option>
+              <option value="NY">New York</option>
+              <option value="TX">Texas</option>
+              <option value="WA">Washington</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 5: Textarea -->
+      <div class="card">
+        <h2>Textarea</h2>
+        <div class="field-group">
+          <label for="ta-address">Full Address</label>
+          <textarea id="ta-address" name="ta_address" placeholder="Enter your full address…"></textarea>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit">Submit (demo — does nothing)</button>
+    </form>
+  </div>
+</body>
+</html>

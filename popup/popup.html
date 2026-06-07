@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoFill AnyForm</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <img src="../icons/icon48.png" alt="AutoFill AnyForm icon" class="logo" />
+      <h1 class="title">AutoFill AnyForm</h1>
+    </header>
+
+    <div class="status-bar" id="statusBar" hidden>
+      <span id="statusText"></span>
+    </div>
+
+    <div class="toggle-row">
+      <label class="toggle-label" for="useLlmToggle">
+        Use LLM for ambiguous fields
+      </label>
+      <label class="switch" aria-label="Toggle LLM mapping">
+        <input type="checkbox" id="useLlmToggle" />
+        <span class="slider"></span>
+      </label>
+    </div>
+    <p class="toggle-hint" id="llmHint" hidden>
+      LLM API key not configured. <a href="#" id="goToOptions">Set it in Options.</a>
+    </p>
+
+    <button class="fill-btn" id="fillBtn">
+      Fill this page
+    </button>
+
+    <div class="result-block" id="resultBlock" hidden>
+      <div class="result-row">
+        <span class="result-label">Filled</span>
+        <span class="result-value" id="filledCount">0</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Skipped</span>
+        <span class="result-value" id="skippedCount">0</span>
+      </div>
+      <div class="result-row" id="unmatchedRow" hidden>
+        <span class="result-label">Needs LLM</span>
+        <span class="result-value" id="unmatchedCount">0</span>
+      </div>
+      <p class="result-message" id="resultMessage"></p>
+    </div>
+
+    <footer class="footer">
+      <a href="#" id="optionsLink">Options / Edit Profile</a>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

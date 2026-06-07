@@ -1,0 +1,41 @@
+{
+  "manifest_version": 3,
+  "name": "AutoFill AnyForm",
+  "version": "1.0.0",
+  "description": "Fill any web form from your saved profile using field heuristics, with optional LLM mapping for ambiguous fields. Data stays local.",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "options_page": "options/options.html",
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["test/sample-form.html"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
