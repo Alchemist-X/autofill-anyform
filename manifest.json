@@ -1,13 +1,23 @@
 {
   "manifest_version": 3,
   "name": "AutoFill AnyForm",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Fill any web form from your saved profile using field heuristics, with optional LLM mapping for ambiguous fields. Data stays local.",
   "permissions": [
     "storage",
     "activeTab",
-    "scripting"
+    "scripting",
+    "tabs"
   ],
+  "commands": {
+    "fill-page": {
+      "suggested_key": {
+        "default": "Alt+Shift+F",
+        "mac": "Alt+Shift+F"
+      },
+      "description": "Fill the active page from your default profile"
+    }
+  },
   "action": {
     "default_popup": "popup/popup.html",
     "default_icon": {

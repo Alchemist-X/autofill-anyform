@@ -8,51 +8,128 @@
 </head>
 <body>
   <div class="container">
+
+    <!-- Header -->
     <header class="header">
-      <img src="../icons/icon48.png" alt="AutoFill AnyForm icon" class="logo" />
-      <h1 class="title">AutoFill AnyForm</h1>
+      <div class="header-left">
+        <img src="../icons/icon48.png" alt="AutoFill AnyForm icon" class="logo" />
+        <h1 class="title">AutoFill AnyForm</h1>
+      </div>
+      <button class="icon-btn" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+        <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
     </header>
 
-    <div class="status-bar" id="statusBar" hidden>
-      <span id="statusText"></span>
+    <!-- First-run empty state -->
+    <div class="empty-state" id="emptyState" hidden>
+      <div class="empty-icon">📋</div>
+      <p class="empty-title">No profile yet</p>
+      <p class="empty-desc">Set up your profile once, fill any form forever.</p>
+      <button class="btn-accent" id="goSetupProfile">Set up profile</button>
     </div>
 
-    <div class="toggle-row">
-      <label class="toggle-label" for="useLlmToggle">
-        Use LLM for ambiguous fields
-      </label>
-      <label class="switch" aria-label="Toggle LLM mapping">
-        <input type="checkbox" id="useLlmToggle" />
-        <span class="slider"></span>
-      </label>
+    <!-- Main content (shown when profile exists) -->
+    <div id="mainContent" hidden>
+
+      <!-- Profile selector -->
+      <div class="field-row">
+        <label class="field-label" for="profileSelect">Profile</label>
+        <div class="select-wrap">
+          <select id="profileSelect" aria-label="Select profile"></select>
+        </div>
+      </div>
+
+      <!-- Site default badge -->
+      <div class="site-badge" id="siteBadge" hidden>
+        <svg class="badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+        </svg>
+        <span id="siteBadgeText"></span>
+        <button class="badge-clear" id="clearSiteDefault" title="Clear site default">×</button>
+      </div>
+
+      <!-- Toggles -->
+      <div class="toggles-card">
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <span class="toggle-label">LLM for ambiguous fields</span>
+            <span class="toggle-desc" id="llmDesc">Off by default · uses your API key</span>
+          </div>
+          <label class="switch" aria-label="Toggle LLM mapping">
+            <input type="checkbox" id="useLlmToggle" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <span class="toggle-label">Highlight unmatched fields</span>
+            <span class="toggle-desc">Show which fields weren't filled</span>
+          </div>
+          <label class="switch" aria-label="Toggle unmatched highlight">
+            <input type="checkbox" id="highlightUnmatched" />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <p class="hint" id="llmHint" hidden>
+        LLM key not configured. <a href="#" id="goToOptionsLlm">Set it in Options →</a>
+      </p>
+
+      <!-- Fill button -->
+      <button class="btn-fill" id="fillBtn">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+        Fill this page
+      </button>
+
+      <!-- Status bar -->
+      <div class="status-bar" id="statusBar" hidden>
+        <span id="statusText"></span>
+      </div>
+
+      <!-- Result summary -->
+      <div class="result-card" id="resultCard" hidden>
+        <div class="result-row">
+          <div class="result-chip chip-filled">
+            <span class="chip-count" id="filledCount">0</span>
+            <span class="chip-label">Filled</span>
+          </div>
+          <div class="result-chip chip-skipped">
+            <span class="chip-count" id="skippedCount">0</span>
+            <span class="chip-label">Skipped</span>
+          </div>
+          <div class="result-chip chip-llm" id="unmatchedChip" hidden>
+            <span class="chip-count" id="unmatchedCount">0</span>
+            <span class="chip-label">Needs LLM</span>
+          </div>
+        </div>
+        <p class="result-msg" id="resultMsg"></p>
+        <button class="btn-link" id="setAsDefaultBtn" hidden>Use this profile for this site</button>
+      </div>
+
     </div>
-    <p class="toggle-hint" id="llmHint" hidden>
-      LLM API key not configured. <a href="#" id="goToOptions">Set it in Options.</a>
-    </p>
 
-    <button class="fill-btn" id="fillBtn">
-      Fill this page
-    </button>
-
-    <div class="result-block" id="resultBlock" hidden>
-      <div class="result-row">
-        <span class="result-label">Filled</span>
-        <span class="result-value" id="filledCount">0</span>
-      </div>
-      <div class="result-row">
-        <span class="result-label">Skipped</span>
-        <span class="result-value" id="skippedCount">0</span>
-      </div>
-      <div class="result-row" id="unmatchedRow" hidden>
-        <span class="result-label">Needs LLM</span>
-        <span class="result-value" id="unmatchedCount">0</span>
-      </div>
-      <p class="result-message" id="resultMessage"></p>
-    </div>
-
+    <!-- Footer -->
     <footer class="footer">
-      <a href="#" id="optionsLink">Options / Edit Profile</a>
+      <a href="#" id="optionsLink">
+        <svg class="foot-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        Options &amp; Profiles
+      </a>
+      <span class="kbd-hint">Alt+Shift+F to fill without popup</span>
     </footer>
+
   </div>
 
   <script src="popup.js"></script>

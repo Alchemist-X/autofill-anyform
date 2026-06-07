@@ -10,28 +10,36 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       font-size: 14px;
       color: #1a1a2e;
-      background: #f5f7fa;
-      padding: 32px 16px;
+      background: #f1f5f9;
+      padding: 32px 16px 64px;
     }
-    .page {
-      max-width: 680px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-    h1 { font-size: 22px; font-weight: 700; color: #1a1a2e; }
-    .subtitle { font-size: 13px; color: #6b7280; margin-top: 4px; }
+    .page { max-width: 700px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+    h1 { font-size: 24px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; }
+    .subtitle { font-size: 13px; color: #64748b; margin-top: 6px; line-height: 1.5; }
     .card {
       background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 20px;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 22px 24px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     }
-    h2 { font-size: 15px; font-weight: 600; }
+    h2 { font-size: 14px; font-weight: 700; color: #0f172a; }
+    .section-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: #eef3ff;
+      color: #4f86f7;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .field-group { display: flex; flex-direction: column; gap: 5px; }
     .field-group.full { grid-column: 1 / -1; }
@@ -40,44 +48,75 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.4px;
-      color: #6b7280;
+      color: #64748b;
     }
-    input, select, textarea {
-      padding: 8px 10px;
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
+    input[type="text"], input[type="email"], input[type="tel"],
+    input[type="url"], input[type="date"], input[type="number"],
+    select, textarea {
+      padding: 9px 11px;
+      border: 1px solid #e2e8f0;
+      border-radius: 7px;
       font-size: 14px;
+      font-family: inherit;
       width: 100%;
       background: #fff;
-      transition: border-color 0.15s;
+      color: #0f172a;
+      transition: border-color 0.15s, box-shadow 0.15s;
     }
     input:focus, select:focus, textarea:focus {
       outline: none;
-      border-color: #4f9ef8;
-      box-shadow: 0 0 0 3px rgba(79,158,248,0.15);
+      border-color: #4f86f7;
+      box-shadow: 0 0 0 3px rgba(79,134,247,0.15);
     }
     textarea { resize: vertical; min-height: 72px; }
+    .radio-group, .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .radio-group label, .checkbox-group label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0;
+      color: #374151;
+      cursor: pointer;
+    }
+    input[type="radio"], input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: #4f86f7;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
     .btn-submit {
       align-self: flex-start;
-      padding: 10px 24px;
-      background: #4f9ef8;
+      padding: 11px 28px;
+      background: #4f86f7;
       color: #fff;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
+      transition: background 0.15s, box-shadow 0.15s;
+      box-shadow: 0 2px 8px rgba(79,134,247,0.3);
     }
-    .btn-submit:hover { background: #3b8ef0; }
+    .btn-submit:hover { background: #3a72e8; box-shadow: 0 4px 12px rgba(79,134,247,0.4); }
     .note {
       font-size: 12px;
-      color: #9ca3af;
-      background: #f9fafb;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 10px 14px;
+      color: #64748b;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px 16px;
+      line-height: 1.6;
     }
-    @media (max-width: 500px) {
+    .note strong { color: #0f172a; }
+    @media (max-width: 520px) {
       .grid { grid-template-columns: 1fr; }
       .field-group.full { grid-column: 1; }
     }
@@ -88,19 +127,22 @@
     <div>
       <h1>Sample Test Form</h1>
       <p class="subtitle">
-        Open the AutoFill AnyForm popup and click "Fill this page" to see the extension in action.
+        Open the <strong>AutoFill AnyForm</strong> popup and click <strong>"Fill this page"</strong> to see the extension in action.
+        Or press <kbd>Alt+Shift+F</kbd> without opening the popup.
       </p>
     </div>
 
     <p class="note">
-      This form uses a variety of field patterns — autocomplete attributes, explicit labels, placeholder text, and ambiguous names — to test heuristic matching.
+      This form covers every field type: <strong>autocomplete attributes</strong>, <strong>label/placeholder heuristics</strong>,
+      <strong>&lt;select&gt; dropdowns</strong>, <strong>radio groups</strong>, <strong>checkboxes</strong>,
+      <strong>date inputs</strong>, and <strong>textareas</strong>. All matched fields flash blue; unmatched fields (with "Highlight unmatched" on) flash amber.
     </p>
 
     <form id="sampleForm" onsubmit="return false;">
 
       <!-- Section 1: Standard autocomplete attributes -->
       <div class="card">
-        <h2>Standard Fields (autocomplete attributes)</h2>
+        <h2>Standard Fields <span class="section-tag">autocomplete attrs</span></h2>
         <div class="grid">
           <div class="field-group">
             <label for="ac-given">First Name</label>
@@ -147,7 +189,7 @@
 
       <!-- Section 2: Label-based heuristic matching -->
       <div class="card">
-        <h2>Label Heuristic Fields (no autocomplete)</h2>
+        <h2>Label Heuristic Fields <span class="section-tag">no autocomplete</span></h2>
         <div class="grid">
           <div class="field-group">
             <label for="h-fname">Given Name</label>
@@ -196,9 +238,9 @@
         </div>
       </div>
 
-      <!-- Section 3: Placeholder-only (no label, no autocomplete) -->
+      <!-- Section 3: aria-label / placeholder only -->
       <div class="card">
-        <h2>Placeholder-Only Fields (aria-label)</h2>
+        <h2>Placeholder / aria-label Fields <span class="section-tag">no visible label</span></h2>
         <div class="grid">
           <div class="field-group">
             <input type="text" aria-label="First name" name="p_first" placeholder="First name" />
@@ -220,12 +262,12 @@
 
       <!-- Section 4: Select dropdowns -->
       <div class="card">
-        <h2>Select Fields</h2>
+        <h2>Select Dropdowns <span class="section-tag">option matching</span></h2>
         <div class="grid">
           <div class="field-group">
             <label for="sel-country">Country</label>
             <select id="sel-country" name="sel_country" autocomplete="country">
-              <option value="">-- Select --</option>
+              <option value="">— Select —</option>
               <option value="US">United States</option>
               <option value="CA">Canada</option>
               <option value="GB">United Kingdom</option>
@@ -233,12 +275,13 @@
               <option value="DE">Germany</option>
               <option value="FR">France</option>
               <option value="JP">Japan</option>
+              <option value="IN">India</option>
             </select>
           </div>
           <div class="field-group">
-            <label for="sel-state">State</label>
+            <label for="sel-state">State / Province</label>
             <select id="sel-state" name="sel_state" autocomplete="address-level1">
-              <option value="">-- Select --</option>
+              <option value="">— Select —</option>
               <option value="AL">Alabama</option>
               <option value="AK">Alaska</option>
               <option value="AZ">Arizona</option>
@@ -254,16 +297,90 @@
         </div>
       </div>
 
-      <!-- Section 5: Textarea -->
+      <!-- Section 5: Radio groups -->
       <div class="card">
-        <h2>Textarea</h2>
-        <div class="field-group">
-          <label for="ta-address">Full Address</label>
-          <textarea id="ta-address" name="ta_address" placeholder="Enter your full address…"></textarea>
+        <h2>Radio Groups <span class="section-tag">radio buttons</span></h2>
+        <div class="grid">
+          <div class="field-group">
+            <label>Contact preference</label>
+            <div class="radio-group" role="radiogroup" aria-label="Contact preference">
+              <label><input type="radio" name="contact_pref" value="email" /> Email</label>
+              <label><input type="radio" name="contact_pref" value="phone" /> Phone</label>
+              <label><input type="radio" name="contact_pref" value="none"  /> No contact</label>
+            </div>
+          </div>
+          <div class="field-group">
+            <label>Employment type</label>
+            <div class="radio-group" role="radiogroup" aria-label="Employment type">
+              <label><input type="radio" name="employment" value="full-time" /> Full-time</label>
+              <label><input type="radio" name="employment" value="part-time" /> Part-time</label>
+              <label><input type="radio" name="employment" value="freelance" /> Freelance</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 6: Checkboxes -->
+      <div class="card">
+        <h2>Checkboxes <span class="section-tag">boolean fields</span></h2>
+        <div class="grid">
+          <div class="field-group">
+            <label>Notifications</label>
+            <div class="checkbox-group">
+              <label>
+                <input type="checkbox" name="newsletter" value="true" />
+                Subscribe to newsletter
+              </label>
+              <label>
+                <input type="checkbox" name="terms" value="true" />
+                I agree to the terms
+              </label>
+            </div>
+          </div>
+          <div class="field-group">
+            <label>Preferences</label>
+            <div class="checkbox-group">
+              <label>
+                <input type="checkbox" name="marketing" value="true" />
+                Receive marketing emails
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 7: Date inputs -->
+      <div class="card">
+        <h2>Date Inputs <span class="section-tag">date fields</span></h2>
+        <div class="grid">
+          <div class="field-group">
+            <label for="dob">Date of Birth</label>
+            <input type="date" id="dob" name="date_of_birth" placeholder="YYYY-MM-DD" />
+          </div>
+          <div class="field-group">
+            <label for="dob2">Birthday (label heuristic)</label>
+            <input type="date" id="dob2" name="birthday" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 8: Textareas -->
+      <div class="card">
+        <h2>Textareas <span class="section-tag">multiline</span></h2>
+        <div class="grid">
+          <div class="field-group full">
+            <label for="ta-address">Full Address</label>
+            <textarea id="ta-address" name="ta_address" placeholder="Enter your full address…"></textarea>
+          </div>
+          <div class="field-group full">
+            <label for="ta-bio">Bio / About (unmatched — try LLM)</label>
+            <textarea id="ta-bio" name="user_biography" placeholder="Tell us about yourself…"></textarea>
+          </div>
         </div>
       </div>
 
       <button type="submit" class="btn-submit">Submit (demo — does nothing)</button>
+
     </form>
   </div>
 </body>
