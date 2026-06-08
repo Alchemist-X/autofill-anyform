@@ -44,7 +44,13 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["test/sample-form.html"],
+      "resources": [
+        "test/sample-form.html",
+        "content/main.mjs",
+        "content/match.mjs",
+        "content/fields.mjs",
+        "content/apply-llm.mjs"
+      ],
       "matches": ["<all_urls>"]
     }
   ]

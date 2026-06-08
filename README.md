@@ -31,6 +31,46 @@ To reload after editing source files: click the refresh icon on the extension ca
 
 ---
 
+## Packaging a distributable `.zip`
+
+The repo ships a **zero-dependency** Node packager (uses only Node builtins — no `npm install` needed):
+
+```bash
+npm run build:zip
+```
+
+This writes `dist/autofill-anyform.zip` containing `manifest.json` and every runtime file Chrome needs (excludes `eval/`, `scripts/`, tests, and VCS files). To load the packaged build:
+
+1. Unzip `dist/autofill-anyform.zip`.
+2. Open `chrome://extensions/`, enable **Developer mode**, click **Load unpacked**, and select the unzipped folder (the one containing `manifest.json`).
+
+The same `.zip` is what you would upload to the Chrome Web Store dashboard.
+
+---
+
+## Project layout & architecture
+
+The matcher and field-type logic live in **pure, DOM-free ES modules** so they are unit-testable and shared between the browser and the test suite:
+
+- `content/match.mjs` — `matchField(descriptor, profile) -> { key, confidence }` (specificity-ranked matcher; fixes the "Company Name"/"Username"/"Cardholder Name" mis-fill bug).
+- `content/fields.mjs` — pure `<select>` / checkbox / radio / date helpers.
+- `content/apply-llm.mjs` — pure `applyLlmMappings(...)` that resolves an LLM mapping to concrete per-field values.
+- `content/main.mjs` — DOM orchestration; statically imports the pure modules.
+- `content/content.js` — a thin classic-script bootstrap that dynamically imports `content/main.mjs` (MV3 declarative content scripts cannot use static `import`). The `.mjs` files are declared in `web_accessible_resources` so the import resolves at runtime.
+
+---
+
+## Tests & self-eval
+
+```bash
+npm test            # node --test (matcher, field helpers, LLM-apply)
+npm run eval        # node eval/eval.mjs — strict pass/fail criteria gate
+```
+
+`npm run eval` runs the criteria in `eval/criteria.md` and prints `PASS Cx` / `FAIL Cx` lines ending in `RESULT: X/Y passed` (exit 0 only when all pass). The eval uses isolated temp dirs for build artifacts and cleans up the produced `.zip` after inspecting it — no artifacts are left in the repo.
+
+---
+
 ## How to set up your profile
 
 1. Click the extension icon → **Options & Profiles** (or right-click the icon → *Options*).
@@ -141,7 +181,11 @@ autofill-anyform/
 ├── background/
 │   └── service-worker.js       Message router, LLM fetch + apply, keyboard command
 ├── content/
-│   └── content.js              Heuristic matcher, field filler, LLM mapping applier
+│   ├── content.js              Classic bootstrap — dynamically imports main.mjs
+│   ├── main.mjs                DOM orchestration (imports the pure modules)
+│   ├── match.mjs               Pure matcher: matchField(descriptor, profile)
+│   ├── fields.mjs              Pure select/checkbox/radio/date helpers
+│   └── apply-llm.mjs           Pure LLM mapping -> per-field value resolver
 ├── popup/
 │   ├── popup.html
 │   ├── popup.css               Design tokens, dark mode, polished UI
@@ -154,8 +198,16 @@ autofill-anyform/
 │   ├── icon16.png
 │   ├── icon48.png
 │   └── icon128.png
+├── scripts/
+│   └── build-zip.mjs           Zero-dep packager (npm run build:zip -> dist/*.zip)
 ├── test/
-│   └── sample-form.html        Covers all field types: text, select, radio, checkbox, date, textarea
+│   ├── sample-form.html        Covers all field types: text, select, radio, checkbox, date, textarea
+│   ├── match.test.mjs          Matcher correctness + mis-fill-bug tests
+│   ├── confidence.test.mjs     Confidence-scoring tests
+│   ├── fields.test.mjs         Field-helper tests
+│   └── apply-llm.test.mjs      LLM-apply tests
+├── eval/                        Self-eval harness (node eval/eval.mjs)
+├── package.json                 npm scripts: test, build:zip, eval (no deps)
 ├── .gitignore
 ├── LICENSE
 └── README.md

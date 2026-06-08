@@ -1,0 +1,40 @@
+{
+  "_comment": "C2/C3 descriptor cases. Each case feeds matchField(descriptor, profile). 'expect' is the required profile key; 'notKey' lists keys that MUST NOT be returned (mis-fill bug). 'mustBeLowOrNull' means: return null OR confidence below the fill threshold.",
+  "profile": {
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "fullName": "Jane Smith",
+    "email": "jane@example.com",
+    "phone": "+1-555-0101",
+    "address1": "123 Main St",
+    "address2": "Apt 4",
+    "city": "Springfield",
+    "state": "IL",
+    "postalCode": "62704",
+    "country": "USA",
+    "company": "Acme Corp",
+    "jobTitle": "Engineer",
+    "website": "https://example.com",
+    "birthDate": "1990-05-15"
+  },
+  "mustMap": [
+    { "label": "Email", "name": "email", "expect": "email" },
+    { "label": "Phone", "name": "phone", "expect": "phone" },
+    { "label": "Company Name", "name": "company_name", "expect": "company", "notKey": ["firstName", "fullName", "lastName"] },
+    { "label": "City", "name": "city", "expect": "city" },
+    { "label": "ZIP/Postal Code", "name": "zip", "expect": "postalCode" },
+    { "label": "Job Title", "name": "job_title", "expect": "jobTitle", "notKey": ["firstName", "fullName", "lastName"] },
+    { "label": "Title", "name": "title", "expect": "jobTitle", "notKey": ["firstName", "fullName", "lastName"] }
+  ],
+  "mustNotMisMap": [
+    { "label": "Cardholder Name", "name": "cc_name", "notKey": ["fullName", "firstName", "lastName"], "mustBeLowOrNull": true },
+    { "label": "Username", "name": "username", "notKey": ["fullName"] }
+  ],
+  "ambiguous": [
+    { "label": "Cardholder Name", "name": "cc_name", "mustBeLowOrNull": true },
+    { "label": "xyzzy", "name": "xyzzy", "mustBeLowOrNull": true }
+  ],
+  "highConfidence": [
+    { "label": "Email", "name": "email" }
+  ]
+}

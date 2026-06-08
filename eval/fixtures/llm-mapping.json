@@ -1,0 +1,28 @@
+{
+  "_comment": "C6 mock LLM mapping fixture. 'mappings' is a {fieldIndex(string) -> profileKey|null} object exactly like the LLM returns. 'fieldDescriptors' is the indexed list that was sent. 'profile' supplies values. 'expectValues' is the required {fieldIndex -> value} the apply step should produce (nulls / empties skipped).",
+  "profile": {
+    "firstName": "Jane",
+    "email": "jane@example.com",
+    "phone": "+1-555-0101",
+    "company": "Acme Corp",
+    "customFields": { "Username": "janesmith42" }
+  },
+  "fieldDescriptors": [
+    { "label": "Work Email", "name": "work_email", "id": "we", "type": "email" },
+    { "label": "Nickname", "name": "nick", "id": "nk", "type": "text" },
+    { "label": "Employer", "name": "emp", "id": "em", "type": "text" },
+    { "label": "Login Handle", "name": "handle", "id": "lh", "type": "text" }
+  ],
+  "mappings": {
+    "0": "email",
+    "1": null,
+    "2": "company",
+    "3": "__custom__Username"
+  },
+  "expectValues": {
+    "0": "jane@example.com",
+    "2": "Acme Corp",
+    "3": "janesmith42"
+  },
+  "expectSkippedIndices": ["1"]
+}
