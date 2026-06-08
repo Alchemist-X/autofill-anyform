@@ -1,230 +1,157 @@
-# AutoFill AnyForm
+<p align="center"><img src="assets/banner.svg" alt="AutoFill AnyForm" width="100%"></p>
 
-A Manifest V3 Chrome extension that fills **any** web form from your saved personal profile using field heuristics, with a fully-implemented optional LLM second-pass for unmatched fields. **All data stays on your machine** — nothing is ever sent to a remote server unless you explicitly configure and enable LLM mode.
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="License MIT"></a>
+  <img src="https://img.shields.io/badge/language-JavaScript-f7df1e?style=flat-square" alt="JavaScript">
+  <img src="https://img.shields.io/badge/manifest-V3-4f9ef8?style=flat-square" alt="Manifest V3">
+  <img src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square" alt="PRs Welcome">
+  <img src="https://img.shields.io/badge/eval-passing-brightgreen?style=flat-square" alt="Eval Passing">
+</p>
+
+# 📝 AutoFill AnyForm
+
+**One click to fill any web form from your saved profile — no browser sync, no cloud, no tracking.**
+
+AutoFill AnyForm is a Chrome extension (Manifest V3) that detects form fields on any page and fills them from a local profile you control. It uses a specificity-ranked heuristic matcher and, when fields are ambiguous, an optional LLM second pass that sends only field metadata — never your personal data — to your chosen API endpoint. Everything else stays in `chrome.storage.local`.
 
 ---
 
-## What's new in v2
+## ✨ Features
 
-- **Multiple profiles** — create "Personal", "Work", or any number of profiles and switch between them in the popup.
-- **Per-site default profile** — after filling, pin a profile to a domain so it's auto-selected next time.
-- **LLM second pass actually applied** — unmatched fields are sent to your configured LLM; the resulting mappings are immediately applied to the page.
+- **Multiple profiles** — create "Personal", "Work", or any custom profile and switch between them from the popup.
+- **Per-site default** — pin a profile to a domain; AutoFill remembers it for every future visit.
+- **Smart heuristic matcher** — ranks `autocomplete`, `name`, `id`, `placeholder`, `aria-label`, and label text by specificity. "Company Name" maps to `company`, not `fullName`.
+- **Confidence scores** — each match carries a confidence value; the popup shows filled / skipped / needs-LLM chips in color.
+- **All field types** — `<input>`, `<select>`, checkboxes, radio groups, date inputs, and textareas.
+- **Optional LLM second pass** — non-English labels, unusual field names? Route unmatched fields to any OpenAI-compatible endpoint. Only label metadata is sent.
+- **Highlight unmatched fields** — toggle to paint unmatched fields amber so you see exactly what the LLM could help with.
 - **Keyboard shortcut** — `Alt+Shift+F` fills the active page without opening the popup.
-- **More field types** — `<select>` (text/value matching), radio groups, checkboxes (boolean from profile), date inputs, textareas.
-- **Confidence scores** — each heuristic match carries a confidence value; the popup reports filled / skipped / needs-LLM counts with colored chips.
-- **Highlight unmatched fields** — toggle to paint unmatched fields amber so you can see what the LLM could help with.
-- **Import / Export profile** — download a profile as JSON or upload one from disk in Options.
-- **Dark mode** — automatic (respects `prefers-color-scheme`) with a manual toggle in both popup and Options.
-- **Polished design system** — consistent accent color, spacing, rounded controls, and dark-mode tokens across popup and options.
+- **Import / Export profiles** — download a profile as JSON, edit it, re-import it.
+- **Dark mode** — auto (respects `prefers-color-scheme`) with a manual toggle in both popup and Options.
+- **Zero remote dependencies** — no `npm install` required to run, test, or package.
 
 ---
 
-## How to load the extension (Chrome)
+## 🎬 How it works
 
-1. Open `chrome://extensions/` in Chrome.
-2. Enable **Developer mode** (top-right toggle).
-3. Click **Load unpacked**.
-4. Select the `autofill-anyform/` folder — the one containing `manifest.json`.
-5. The icon appears in your toolbar. Click it to open the popup.
+```mermaid
+sequenceDiagram
+    participant User
+    participant Popup
+    participant ContentScript as Content Script
+    participant Matcher as match.mjs
+    participant LLM as LLM API (optional)
+    participant Storage as chrome.storage.local
 
-To reload after editing source files: click the refresh icon on the extension card in `chrome://extensions/`.
+    User->>Popup: Click "Fill this page" (or Alt+Shift+F)
+    Popup->>Storage: Load active profile
+    Storage-->>Popup: profile JSON
+    Popup->>ContentScript: fillPage(profile, options)
+    ContentScript->>ContentScript: Collect field descriptors
+    ContentScript->>Matcher: matchField(descriptor, profile) per field
+    Matcher-->>ContentScript: {key, confidence} or null
+    alt unmatched fields + LLM enabled
+        ContentScript->>LLM: POST field metadata only
+        LLM-->>ContentScript: {fieldIndex: profileKey, ...}
+    end
+    ContentScript->>ContentScript: Write values, flash fills
+    ContentScript-->>Popup: {filled, skipped, llmFilled}
+    Popup-->>User: Result chips (green / amber / blue)
+```
 
 ---
 
-## Packaging a distributable `.zip`
+## 🚀 Quickstart
 
-The repo ships a **zero-dependency** Node packager (uses only Node builtins — no `npm install` needed):
+### 1. Load as an unpacked extension
+
+1. Clone or download this repo.
+2. Open `chrome://extensions/` in Chrome.
+3. Enable **Developer mode** (top-right toggle).
+4. Click **Load unpacked** and select the `autofill-anyform/` folder — the one containing `manifest.json`.
+5. The AutoFill icon appears in your toolbar.
+
+### 2. Set up your profile
+
+1. Click the extension icon → **Options & Profiles** (or right-click → *Options*).
+2. Under **Profiles**, use the default "Personal" profile or create a new one.
+3. Fill in Identity, Address, and Work fields. Add **Custom Fields** for anything else.
+4. Click **Save profile**.
+
+### 3. Fill a form
+
+Navigate to any page with a form and click the extension icon → **Fill this page**, or press `Alt+Shift+F`.
+
+### 4. Run the tests
+
+```bash
+npm test
+```
+
+### 5. Package a distributable ZIP
 
 ```bash
 npm run build:zip
+# Writes dist/autofill-anyform.zip — ready for the Chrome Web Store dashboard.
 ```
 
-This writes `dist/autofill-anyform.zip` containing `manifest.json` and every runtime file Chrome needs (excludes `eval/`, `scripts/`, tests, and VCS files). To load the packaged build:
-
-1. Unzip `dist/autofill-anyform.zip`.
-2. Open `chrome://extensions/`, enable **Developer mode**, click **Load unpacked**, and select the unzipped folder (the one containing `manifest.json`).
-
-The same `.zip` is what you would upload to the Chrome Web Store dashboard.
-
----
-
-## Project layout & architecture
-
-The matcher and field-type logic live in **pure, DOM-free ES modules** so they are unit-testable and shared between the browser and the test suite:
-
-- `content/match.mjs` — `matchField(descriptor, profile) -> { key, confidence }` (specificity-ranked matcher; fixes the "Company Name"/"Username"/"Cardholder Name" mis-fill bug).
-- `content/fields.mjs` — pure `<select>` / checkbox / radio / date helpers.
-- `content/apply-llm.mjs` — pure `applyLlmMappings(...)` that resolves an LLM mapping to concrete per-field values.
-- `content/main.mjs` — DOM orchestration; statically imports the pure modules.
-- `content/content.js` — a thin classic-script bootstrap that dynamically imports `content/main.mjs` (MV3 declarative content scripts cannot use static `import`). The `.mjs` files are declared in `web_accessible_resources` so the import resolves at runtime.
-
----
-
-## Tests & self-eval
+### 6. Run the self-eval harness
 
 ```bash
-npm test            # node --test (matcher, field helpers, LLM-apply)
-npm run eval        # node eval/eval.mjs — strict pass/fail criteria gate
-```
-
-`npm run eval` runs the criteria in `eval/criteria.md` and prints `PASS Cx` / `FAIL Cx` lines ending in `RESULT: X/Y passed` (exit 0 only when all pass). The eval uses isolated temp dirs for build artifacts and cleans up the produced `.zip` after inspecting it — no artifacts are left in the repo.
-
----
-
-## How to set up your profile
-
-1. Click the extension icon → **Options & Profiles** (or right-click the icon → *Options*).
-2. Under **Profiles**, create a new profile or use the default "Personal" one.
-3. Fill in **Identity**, **Address**, and **Work** fields as desired.
-4. Add **Custom Fields** for anything not covered (e.g. `Username → janesmith42`).
-5. Click **Save profile**.
-
-Tip: create a "Work" profile with your company address and switch to it from the popup's profile selector.
-
----
-
-## How the heuristic works
-
-Each form field gets a descriptor string built from its `autocomplete`, `name`, `id`, `placeholder`, `aria-label`, and label text. That string is scored against a keyword map:
-
-| Profile key  | Matched patterns (examples)                        |
-|--------------|----------------------------------------------------|
-| firstName    | first name, fname, given name, forename            |
-| lastName     | last name, lname, surname, family name             |
-| fullName     | full name, your name, name                         |
-| email        | email, e-mail                                      |
-| phone        | phone, tel, mobile, cell                           |
-| address1     | address, street, address line 1, line 1            |
-| address2     | apt, suite, unit, address line 2                   |
-| city         | city, town, locality                               |
-| state        | state, region, province, county                    |
-| postalCode   | zip, postal, postcode, pin code                    |
-| country      | country, nation                                    |
-| company      | company, organization, employer, firm              |
-| jobTitle     | job title, title, position, role, occupation       |
-| website      | website, url, homepage, site                       |
-| birthDate    | birth date, dob, date of birth, birthday           |
-
-The `autocomplete` attribute is checked first — when present and recognized, it wins immediately (confidence = 1.0). Custom fields are matched by their key name appearing in the field descriptor.
-
----
-
-## Optional LLM mapping
-
-Fields the heuristic cannot match (unusual labels, non-English forms, etc.) can be routed to an LLM:
-
-1. In **Options → LLM**, enter your API endpoint (default: `https://api.openai.com/v1/chat/completions`), model (default: `gpt-4o-mini`), and API key.
-2. In the popup, enable **"LLM for ambiguous fields"**.
-3. Click **Fill this page** — unmatched field descriptors are sent to the LLM, which returns a mapping to profile keys. Those fields are then filled immediately in the page.
-
-The LLM prompt sends only field metadata (label text, name, placeholder) — **no page content or form values** are transmitted.
-
----
-
-## Keyboard shortcut
-
-Press **`Alt+Shift+F`** on any page to trigger a fill using your active (or site-default) profile without opening the popup. You can change the shortcut at `chrome://extensions/shortcuts`.
-
----
-
-## Per-site default profile
-
-After filling a page, a **"Use this profile for this site"** link appears in the result summary. Click it to remember the chosen profile for that domain. The popup shows a badge when a site default is active, with a `×` to clear it.
-
----
-
-## Import / Export
-
-In **Options → Profiles**:
-- **Export profile** — downloads the current profile as a `.json` file.
-- **Import profile** — uploads a `.json` file and adds it as a new profile.
-
-The JSON format is human-readable and can be edited with any text editor.
-
----
-
-## Privacy
-
-- Your profile and API key are stored exclusively in `chrome.storage.local` — local to your browser profile, never synced or sent to any remote server by this extension.
-- LLM calls are only made when you have explicitly configured an endpoint + key **and** enabled the toggle in the popup.
-- No analytics, no tracking, no remote code.
-
----
-
-## Manual test steps
-
-1. Load the extension from `autofill-anyform/` via **Load unpacked**.
-2. Go to **Options**, create a profile, fill in at least: first name, last name, email, phone, address, city, state, zip, country, company, job title, birthdate. Save.
-3. Open `test/sample-form.html` in Chrome (File → Open File, or drag and drop).
-4. Click the extension icon → **Fill this page**. Verify:
-   - Autocomplete-attribute fields fill correctly (Section 1).
-   - Label-heuristic fields fill correctly (Section 2).
-   - aria-label / placeholder-only fields fill (Section 3).
-   - `<select>` dropdowns for Country and State update (Section 4).
-   - Date of Birth inputs populate with the ISO date (Section 7).
-   - Textareas fill (Section 8 — "Full Address" should fill from `address1`).
-   - Filled fields flash blue briefly.
-5. Enable **"Highlight unmatched fields"** in the popup and re-fill — the bio textarea (unmatched) should flash amber.
-6. Test **keyboard shortcut**: press `Alt+Shift+F` on the sample form without opening the popup. Fields should fill.
-7. Test **multi-profile**: create a second profile in Options with different values. Switch to it in the popup selector, re-fill, verify the new values appear.
-8. Test **import/export**: export a profile, edit the JSON, re-import it.
-9. Test **dark mode**: click the moon/sun icon in the popup or choose a theme in Options → Appearance.
-10. **(LLM, optional)**: configure an OpenAI-compatible key in Options → LLM, enable the toggle, and fill — unmatched fields (e.g. bio) should be filled by the LLM.
-
----
-
-## File structure
-
-```
-autofill-anyform/
-├── manifest.json               MV3 manifest — v2.0.0, adds "commands"
-├── background/
-│   └── service-worker.js       Message router, LLM fetch + apply, keyboard command
-├── content/
-│   ├── content.js              Classic bootstrap — dynamically imports main.mjs
-│   ├── main.mjs                DOM orchestration (imports the pure modules)
-│   ├── match.mjs               Pure matcher: matchField(descriptor, profile)
-│   ├── fields.mjs              Pure select/checkbox/radio/date helpers
-│   └── apply-llm.mjs           Pure LLM mapping -> per-field value resolver
-├── popup/
-│   ├── popup.html
-│   ├── popup.css               Design tokens, dark mode, polished UI
-│   └── popup.js                Profile selector, site default, toggles, result chips
-├── options/
-│   ├── options.html            Sidebar layout, all sections
-│   ├── options.css             Sidebar + dark mode design system
-│   └── options.js              Multi-profile CRUD, import/export, theme, LLM config
-├── icons/
-│   ├── icon16.png
-│   ├── icon48.png
-│   └── icon128.png
-├── scripts/
-│   └── build-zip.mjs           Zero-dep packager (npm run build:zip -> dist/*.zip)
-├── test/
-│   ├── sample-form.html        Covers all field types: text, select, radio, checkbox, date, textarea
-│   ├── match.test.mjs          Matcher correctness + mis-fill-bug tests
-│   ├── confidence.test.mjs     Confidence-scoring tests
-│   ├── fields.test.mjs         Field-helper tests
-│   └── apply-llm.test.mjs      LLM-apply tests
-├── eval/                        Self-eval harness (node eval/eval.mjs)
-├── package.json                 npm scripts: test, build:zip, eval (no deps)
-├── .gitignore
-├── LICENSE
-└── README.md
+npm run eval
+# Prints PASS/FAIL for each criterion and exits 0 only when all pass.
 ```
 
 ---
 
-## Limitations
+## ⚙️ Configuration
 
-- **JavaScript-gated forms**: some SPAs render fields after heavy JS execution. If no fields are found, try filling again after the page fully loads.
-- **Shadow DOM**: fields inside closed shadow roots are not reachable via `querySelectorAll`.
-- **Multi-step wizards**: only the currently visible fields are filled. Click "Fill this page" again on each step.
-- **LLM latency**: with LLM mode on, there will be a brief pause while the API responds.
-- **Keyboard shortcut conflict**: if `Alt+Shift+F` is taken by another extension, change it at `chrome://extensions/shortcuts`.
+All configuration lives in **Options** (right-click the icon → Options, or click **Options & Profiles** in the popup).
+
+| Option | Where | Description |
+|---|---|---|
+| Profile fields | Options → Profiles | Name, address, work, custom key-value pairs |
+| Active profile | Popup selector | Switch profiles per fill |
+| Per-site default | Popup → "Use for this site" | Remember a profile for a domain |
+| Highlight unmatched | Popup toggle | Paint unmatched fields amber |
+| Theme | Options → Appearance | Auto / Light / Dark |
+| LLM endpoint | Options → LLM | Your OpenAI-compatible base URL |
+| LLM model | Options → LLM | e.g. `gpt-4o-mini`, `moonshot-v1-8k` |
+| LLM API key | Options → LLM | Stored only in `chrome.storage.local` |
+
+### Optional LLM integration
+
+AutoFill supports any OpenAI-compatible chat completions API. Only field metadata (labels, names, placeholders) is ever sent — never your profile values.
+
+```
+LLM_BASE_URL  https://api.openai.com/v1/chat/completions   (default)
+LLM_MODEL     gpt-4o-mini                                  (default)
+LLM_API_KEY   sk-...                                       (your key)
+```
+
+Works out of the box with **OpenAI**, **Kimi / Moonshot** (`https://api.moonshot.cn/v1/chat/completions`), and any other OpenAI-compatible provider. When no LLM is configured, the heuristic matcher handles everything locally.
 
 ---
 
-## License
+## 🗺️ Roadmap / Needs
 
-MIT © 2026 Alchemist-X
+The core fill pipeline is fully working. Here is what would make it even better:
+
+- [ ] **Firefox / Edge support** — the MV3 manifest is mostly compatible; needs testing and minor adjustments.
+- [ ] **Shadow DOM traversal** — reach fields inside open shadow roots.
+- [ ] **Multi-step wizard support** — auto-advance and fill each step sequentially.
+- [ ] **Chrome Web Store listing** — polish icons and write the store description.
+- [ ] **Profile encryption at rest** — encrypt `chrome.storage.local` entries with a user passphrase.
+- [ ] **Sync profiles** — optional `chrome.storage.sync` for profile portability across devices.
+
+PRs and issues are very welcome.
+
+---
+
+## 📄 License
+
+MIT © 2026 Alchemist-X — see [LICENSE](LICENSE).
+
+---
+
+<p align="center">If AutoFill AnyForm saves you time, give it a ⭐ — it helps others find the project.</p>

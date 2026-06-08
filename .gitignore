@@ -2,3 +2,8 @@
 dist/
 *.zip
 node_modules/
+out/
+cache/
+broadcast/
+.env
+.env.*
